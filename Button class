@@ -1,0 +1,77 @@
+#This button class creates a rectangular button in a pygame window 
+#You can control the colour of the background, but not the colour of the text, feel free to add it as an additional arguement
+#Initialisation eg. Button(0,0,100,100,win,'rect',pygame.Color('red'),"fonts/Cambria.ttf","Hello, World!",12,[change_bool,up_score])
+
+#This class requires the following to exist:
+#a boolean which tracks if the left mouse button was pressed, this is done within the game loop' pygame.event.get()
+left_mouse = false 
+#an initialised pygame surface
+#eg win = pygame.display.set_mode((win_width,win_height),pygame.FULLSCREEN,0)
+
+#Class relies on an initialised font library, by font typeface and size (you should only render font once)
+#the path is a string with the location of the .ttf file eg. "fonts/Cambria.ttf"
+#size of font is an integer
+
+font_library = {}
+def get_font(path,size):
+    global font_library
+    font = font_library.get((path,size))
+    if font == None:
+        font = pygame.font.Font(path,size)
+        font_library[path] = (font,size)
+    return font
+    
+'''The functionality of the button relies on additional functions you define, eg:
+some_boolean = True
+score = 0
+def change_bool():
+    some_boolean = False
+
+def up_score():
+    score += 100
+    '''
+
+class Button(object):
+
+    def __init__(self,x,y,length_x,length_y,window,shape,colour,font,text,text_size,function):
+
+        self.x = x
+        self.y = y
+        self.length_x = length_x
+        self.length_y = length_y
+        self.window = window
+        self.shape = shape
+        self.colour = colour
+        self.font = font
+        self.text = text
+        self.text_size = text_size
+        self.function = function
+        global mouse_left
+
+        if shape == 'rect':
+
+            pygame.draw.rect(win, colour, [x, y, length_x, length_y], 0)
+            
+            #measure size of text
+            size_x,size_y = get_font(cambria, text_size).size(text)            
+
+            # drawing text onto surface and centering
+            window.blit(get_font(font, text_size).render(text,True, pygame.Color('black')),
+                     (x+length_x/2-size_x/2, y+length_y/2-size_y/2))
+
+
+            # if left mouse button pressed, count frames and log position of mouse
+            if mouse_left == True:
+                #check location of the mouse
+                (mouse_x, mouse_y) = pygame.mouse.get_pos()
+                # if colission with the button rect
+                if mouse_x > x and mouse_x < x + length_x and mouse_y > y and mouse_y < y + length_y:
+
+                    mouse_left = False
+                    #per name in functions argument, you will execute the function with the same name
+                    for call in function:
+                        call()
+                
+                else:
+                    mouse_left = False
+                   
